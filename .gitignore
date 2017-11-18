@@ -1,0 +1,7 @@
+/*.log
+/target
+/*-init.clj
+/resources/public/js/compiled
+.nrepl-port
+/.cljs_rhino_repl/
+out
