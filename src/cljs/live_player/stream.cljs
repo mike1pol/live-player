@@ -3,31 +3,30 @@
             [re-frame.core :as rf]))
 
 (def path (js/require "path"))
-(def crypto-js (js/require "crypto"))
-(def peerflix (js/require "peerflix"))
+(def web-torrent (js/require "webtorrent"))
 
-(def stream (r/atom nil))
+(def stream (web-torrent.))
+
+(do
+  (.on stream "error" #(.log js/console %)))
+
+(defn torrent-start [torrent]
+  (.log js/console torrent))
 
 (defn start [file]
   (let [tmp-dir (rf/subscribe [:get-in [:tmp-dir]])
-        options {:connections 100
-                 :dht true
-                 :tracker true
-                 :port 0
-                 :trackers ["udp://tracker.openbittorrent.com:80"
-                            "udp://tracker.coppersurfer.tk:6969"
-                            "udp://open.demonii.com:1337"]
-                 :tmp @tmp-dir
-                 :path (.join path @tmp-dir (get-in file [:info :infoHash]))
-                 :buffer (.toString (* 1.5  1024 1024))
-                 :index 0
-                 :name (get-in file [:info :infoHash])
-                 :id (.toString (.pseudoRandomBytes crypto-js 10) "hex")}]
-    (println options)
-    ;; verify - event
-    ;; ready - event
-    ;; uninterested - event
-    ;; interested - event
+        options {:path @tmp-dir
+                 :maxWebConns 10}]
+    (.forEach
+     (aget stream "torrents")
+     (fn [torrent]
+       (let [hash (aget torrent "infoHash")]
+         (println hash)
+         (.remove stream hash (fn [err]
+                                (if-not (empty? err)
+                                  (.error js/console err)
+                                  (.log js/console "removed: ", hash)))))))
+    (.add stream (clj->js (:info file)) (clj->js options) torrent-start)
     (println "Start stream")))
 
 (defn stop []

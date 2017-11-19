@@ -7,7 +7,7 @@
 
 (def fs (js/require "fs"))
 (def path (js/require "path"))
-(def read-torrent (js/require "read-torrent"))
+(def parse-torrent (js/require "parse-torrent"))
 
 ;; change page
 (defn change-page [event page]
@@ -24,20 +24,16 @@
               :last-modified-date (aget file-js "lastModifiedDate")
               :size (aget file-js "size")
               :type (aget file-js "type")}
-        file-orig (aget file-js "path")
+        file-orig (.readFileSync fs (aget file-js "path"))
+        info (parse-torrent file-orig)
         file-path (.join path @tmp-dir (str (:hash file) ".torrent"))]
     (when (str/ends-with? (:name file) ".torrent")
       (when-not (.existsSync fs file-path)
-        (.writeFileSync fs file-path (.readFileSync fs file-orig)))
-      (read-torrent
-       file-path
-       (fn [err res]
-         (if err
-           (rf/dispatch [:error :loader err])
-           (let [file (merge file {:path file-path
-                                   :info (js->clj res :keywordize-keys true)})]
-             (rf/dispatch [:drop-file file])
-             (stream/start file))))))))
+        (.writeFileSync fs file-path file-orig))
+      (let [file (merge file {:path file-path
+                              :info (js->clj info :keywordize-keys true)})]
+        (rf/dispatch [:drop-file file])
+        (stream/start file)))))
 
 ;; interop react-dropzone component
 (def dropzone (r/adapt-react-class (js/require "react-dropzone")))
