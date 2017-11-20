@@ -22,3 +22,9 @@
  :error
  (fn [db [_ path error]]
    (assoc-in db [:errors path] error)))
+
+
+(rf/reg-event-db
+ :update-info
+ (fn [db [_ info]]
+   (assoc-in db [:info] info)))

@@ -13,5 +13,5 @@
    :page :index
    :tmp-dir tmp-dir
    :file nil
-   :state nil
+   :info nil
    :time nil})
