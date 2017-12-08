@@ -4,7 +4,8 @@
             [live-player.components.core :as core]
             [live-player.components.index :refer [index]]
             [live-player.components.player :refer [player]]
-            [live-player.components.loader :refer [loader]]))
+            [live-player.components.loader :refer [loader]]
+            [live-player.stream :as stream]))
 
 
 (def drop-container {:display "flex"
@@ -24,7 +25,8 @@
 
 (defn app-root []
   (let [current-page (rf/subscribe [:current-page])
-        has-drop (r/atom nil)]
+        has-drop (r/atom nil)
+        file (rf/subscribe [:file])]
     (fn [_]
       [core/dropzone
        {:on-drop #(do
@@ -35,6 +37,7 @@
         :onDragLeave #(reset! has-drop nil)
         :activeStyle drop-container-active
         :style drop-container}
+       [stream/watch-streams]
        (if @has-drop
          [:div {:style drop-body}
           "Drop you file"]

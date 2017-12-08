@@ -4,7 +4,8 @@
             [live-player.config :as config]
             [reagent.core :as r]
             [re-frame.core :as rf]
-            [live-player.components.root :refer [app-root]]))
+            [live-player.components.root :refer [app-root]]
+            [live-player.stream :refer [watch-streams]]))
 
 
 (defn dev-setup []

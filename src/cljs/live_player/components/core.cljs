@@ -32,8 +32,7 @@
         (.writeFileSync fs file-path file-orig))
       (let [file (merge file {:path file-path
                               :info (js->clj info :keywordize-keys true)})]
-        (rf/dispatch [:drop-file file])
-        (stream/start file)))))
+        (rf/dispatch [:drop-file file])))))
 
 ;; interop react-dropzone component
 (def dropzone (r/adapt-react-class (js/require "react-dropzone")))

@@ -2,6 +2,10 @@
   (:require [reagent.core :as r]
             [re-frame.core :as rf]))
 
+(defn watch-streams []
+  (let [file (rf/subscribe [:file])]
+    (println @file)))
+
 (def path (js/require "path"))
 (def web-torrent (js/require "webtorrent"))
 
